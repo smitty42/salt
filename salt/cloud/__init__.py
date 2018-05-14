@@ -1416,7 +1416,7 @@ class Cloud(object):
         profile_details = self.opts['profiles'][profile]
         vms = {}
         for prov in mapped_providers:
-            prov_name = mapped_providers[prov].keys()[0]
+            prov_name = list(mapped_providers[prov].keys())[0]
             for node in mapped_providers[prov][prov_name]:
                 vms[node] = mapped_providers[prov][prov_name][node]
                 vms[node]['provider'] = prov
