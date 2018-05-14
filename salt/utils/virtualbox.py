@@ -321,6 +321,28 @@ def vb_list_machines(**kwargs):
         ]
 
 
+def vb_import_ovf(name=None, timeout=10000, **kwargs):
+    """
+    Import an OVF and use it to create a machine on the virtualbox hypervisor
+    """
+    print('-------------- NOT in shim -----------------')
+    print('image from kwargs',kwargs.get("image"))
+    image = kwargs.get('image', None)
+    # do validation here or earlier?
+    vbox = vb_get_box()
+    log.info("Import virtualbox ovf machine %s ", name)
+    new_machine = vbox.createAppliance()
+    new_machine.read(image)
+    new_machine.interpret()
+    progress = new_machine.importMachines([])
+    print('----------- progress: ', progress)
+    import time
+    time.sleep(30)
+    #new_machine.progress.waitForCompletion(timeout)
+    log.info("Finished creating %s", name)
+    return vb_xpcom_to_attribute_dict(new_machine, "IMachine")
+
+
 def vb_create_machine(name=None):
     """
     Creates a machine on the virtualbox hypervisor

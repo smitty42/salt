@@ -32,6 +32,7 @@ try:
     from salt.utils.virtualbox import (
         vb_list_machines,
         vb_clone_vm,
+        vb_import_ovf,
         vb_machine_exists,
         vb_destroy_machine,
         vb_get_machine,
@@ -155,6 +156,12 @@ def create(vm_info):
         'clone_from': vm_info['clonefrom']
     }
 
+    if 'image' in vm_info:
+        request_kwargs['image'] = vm_info['image'] ## Location of ovf on filesystem
+        importing_ovf = True
+    else:
+        importing_ovf = False
+
     cloud.fire_event(
         'event',
         'requesting instance',
@@ -163,7 +170,13 @@ def create(vm_info):
         sock_dir=__opts__['sock_dir'],
         transport=__opts__['transport']
     )
-    vm_result = vb_clone_vm(**request_kwargs)
+
+    print('in driver, image: ', request_kwargs['image'])
+
+    if importing_ovf:
+        vm_result = vb_import_ovf(**request_kwargs)
+    else:
+        vm_result = vb_clone_vm(**request_kwargs)
 
     # Booting and deploying if needed
     if power:
